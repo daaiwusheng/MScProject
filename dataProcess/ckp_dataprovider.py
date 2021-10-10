@@ -22,10 +22,25 @@ number_frames = 2
 
 
 class CKPDataProvider(object):
-    def __init__(self):
+    def __init__(self, reconstruct=False):
         # on Linux
         self.root_dir = '/home/steven/桌面/AICode/project_dataset/CK+/Emotion'
         self.r_dir_images = '/home/steven/桌面/AICode/project_dataset/CK+/cohn-kanade-images/'
+        self.save_dir = "/home/steven/桌面/MScProjectReports/savehandeldata/"
+        self.save_train_dir = self.save_dir + 'ck_train.csv'
+        self.save_validate_dir = self.save_dir + 'ck_validate.csv'
+
+        data_exist_bool = os.path.exists(self.save_train_dir) & os.path.exists(self.save_validate_dir)
+
+        if reconstruct:
+            self.__constrrct_data()
+        elif not data_exist_bool:
+            self.__constrrct_data()
+        else:
+            pass
+
+
+    def __constrrct_data(self):
         self.dirs_emotion_actors = self.get_dirs_emotion_actors()
         # actor means the code like S506,
         # every emotion dir is an actor's emotion dir, in which it's maybe more than one emotions
@@ -54,13 +69,29 @@ class CKPDataProvider(object):
         self.get_dict_train_key_emotion()
         self.dict_validate_key_emotion = {}  # key is S011/001, v is emotion label
         self.get_dict_validate_key_emotion()
-        self.dict_train_image_filename_emotion = {}  # key is image dir, v is emotion label
+        self.dict_train_image_filename_emotion = {}  # key is image file name, v is emotion label
         self.neutral_train_image_files = []
         self.get_dict_train_image_filename_emotion()
-        self.dict_validate_image_filename_emotion = {}  # key is image dir, v is emotion label
+        self.dict_validate_image_filename_emotion = {}  # key is image file name, v is emotion label
         self.neutral_validate_image_files = []
         self.get_dict_validate_image_filename_emotion()
         self.get_neutral_img_for_train_val()
+
+        self.dict_train_image_dir_emotion = {}  # key is like "CK+/cohn-kanade-images/S005/001/S005_001_00000001.png"
+        self.dict_validate_image_dir_emotion = {}
+        self.get_image_dir_dict(self.dict_train_image_filename_emotion, self.dict_train_image_dir_emotion)
+        self.get_image_dir_dict(self.dict_validate_image_filename_emotion, self.dict_validate_image_dir_emotion)
+
+        save_dict_as_csv(self.save_train_dir, self.dict_train_image_dir_emotion)
+        save_dict_as_csv(self.save_validate_dir, self.dict_validate_image_dir_emotion)
+
+    def get_image_dir_dict(self,dict_image_file_emotion,dict_result):
+        relative_dir_r = "CK+/cohn-kanade-images/"
+        for image_file, emotion in dict_image_file_emotion.items():
+            image_file_splits = image_file.split('_')
+            dir_image = image_file_splits[0] + '/' + image_file_splits[1]
+            image_dir = os.path.join(relative_dir_r + dir_image, image_file)
+            dict_result[image_dir] = emotion
 
 
     def get_neutral_img_for_train_val(self):
