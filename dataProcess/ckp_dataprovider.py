@@ -1,4 +1,6 @@
 import os
+import random
+
 from utility.tools import *
 import numpy as np
 
@@ -16,6 +18,8 @@ emotion_labs = [Neutral, Anger, Contempt, Disgust, Fear, Happiness, Sadness, Sur
 
 split_factor = 0.8
 
+number_frames = 2
+
 
 class CKPDataProvider(object):
     def __init__(self):
@@ -25,6 +29,8 @@ class CKPDataProvider(object):
         self.dirs_emotion_actors = self.get_dirs_emotion_actors()
         # actor means the code like S506,
         # every emotion dir is an actor's emotion dir, in which it's maybe more than one emotions
+        self.actors_list = list()
+        self.get_all_actors()
         # 找到每个演员所拥有的有效表情，也就是标签
         # 也找到每个表情所对应的演员
         # 找到每个图片所对应的标签
@@ -33,12 +39,90 @@ class CKPDataProvider(object):
         self.get_necessary_data()
         self.dict_actor_labels = {}  # key is actor s160, v is array including labels
         self.get_dict_actor_labels()
-        self.dict_emotion_actors = {}  # key is emotion, v is array including acotrs
+        self.dict_emotion_actors = {}  # key is emotion, v is array including actors
         self.get_dict_emotion_actors()
         self.dict_train_emotion_actors = {}  # train set
         self.dict_validate_emotion_actors = {}  # validation set
-        self.whole_train_actors_list = []
+        self.whole_train_actors_list = []  # store all train actors
         self.handle_train_validate_sets()
+        # self.test_train_actors()  # test if the train data is split correctly
+        self.whole_validate_actors_list = []  # store all validate actors
+        self.get_validate_actors_list()
+        # 根据actor把图片key值拿到， 然后取出最后2 frames
+        # 然后图片名作为key，label作为v
+        self.dict_train_key_emotion = {}  # key is S011/001, v is emotion label
+        self.get_dict_train_key_emotion()
+        self.dict_validate_key_emotion = {}  # key is S011/001, v is emotion label
+        self.get_dict_validate_key_emotion()
+        self.dict_train_image_filename_emotion = {}  # key is image dir, v is emotion label
+        self.neutral_train_image_files = []
+        self.get_dict_train_image_filename_emotion()
+        self.dict_validate_image_filename_emotion = {}  # key is image dir, v is emotion label
+        self.neutral_validate_image_files = []
+        self.get_dict_validate_image_filename_emotion()
+        self.get_neutral_img_for_train_val()
+
+
+    def get_neutral_img_for_train_val(self):
+        #  randomly get neutral images for train and validate sets
+        num_classes_out_neutral = 7
+        random.shuffle(self.neutral_train_image_files)
+        num_train_neutral = int(len(self.dict_train_image_filename_emotion)/num_classes_out_neutral)
+        images_need_train_neutral = self.neutral_train_image_files[:num_train_neutral]
+
+        for image_file_name in images_need_train_neutral:
+            self.dict_train_image_filename_emotion[image_file_name] = 0
+
+        random.shuffle(self.neutral_validate_image_files)
+        num_validate_neutral = int(len(self.dict_validate_image_filename_emotion)/num_classes_out_neutral)
+        images_need_validate_neutral = self.neutral_validate_image_files[:num_validate_neutral]
+
+        for image_file_name in images_need_validate_neutral:
+            self.dict_validate_image_filename_emotion[image_file_name] = 0
+
+        # print("line",get_line_num(),len(images_need_train_neutral)," ",len(images_need_validate_neutral))
+
+
+    def get_dict_validate_image_filename_emotion(self):
+        for ikey, emotion in self.dict_validate_key_emotion.items():
+            for r, _, image_files in os.walk(os.path.join(self.r_dir_images, ikey)):
+                image_files = outclude_hidden_files(image_files)
+                image_files.sort()
+                image_files_need = image_files[-number_frames:]
+                self.neutral_validate_image_files.append(image_files[0])
+                for image_file in image_files_need:
+                    self.dict_validate_image_filename_emotion[image_file] = emotion
+
+    def get_dict_train_image_filename_emotion(self):
+        for ikey, emotion in self.dict_train_key_emotion.items():
+            for r, _, image_files in os.walk(os.path.join(self.r_dir_images, ikey)):
+                image_files = outclude_hidden_files(image_files)
+                image_files.sort()
+                image_files_need = image_files[-number_frames:]
+                self.neutral_train_image_files.append(image_files[0])
+                for image_file in image_files_need:
+                    self.dict_train_image_filename_emotion[image_file] = emotion
+
+
+    def get_dict_validate_key_emotion(self):
+        for actor in self.whole_validate_actors_list:
+            for k, emotion in self.dict_key_seq_labels.items():
+                k_actor = k.split('/')[0]
+                if k_actor == actor:
+                    self.dict_validate_key_emotion[k] = emotion
+
+    def get_dict_train_key_emotion(self):
+        for actor in self.whole_train_actors_list:
+            for k, emotion in self.dict_key_seq_labels.items():
+                k_actor = k.split('/')[0]
+                if k_actor == actor:
+                    self.dict_train_key_emotion[k] = emotion
+
+    def get_validate_actors_list(self):
+        self.whole_validate_actors_list = list(set(self.actors_list).difference(set(self.whole_train_actors_list)))
+        # print(len(self.actors_list))
+        # print(len(self.whole_validate_actors_list))
+        # print(len(self.whole_train_actors_list))
 
     def handle_train_validate_sets(self):
         # first, sort emotions by the relative number of actors
@@ -58,7 +142,23 @@ class CKPDataProvider(object):
                 self.whole_train_actors_list = self.whole_train_actors_list + actors_not_in_train[:number_move_to_train]
                 # self.dict_train_emotion_actors[emotion] = actors_train_list
 
-
+    def test_train_actors(self):
+        # produce dict_train_emotion_actors
+        for actor in self.whole_train_actors_list:
+            emotions_list = self.dict_actor_labels[actor]
+            for emotion in emotions_list:
+                if emotion in self.dict_train_emotion_actors:
+                    actors_list = self.dict_train_emotion_actors[emotion]
+                    actors_list.append(actor)
+                else:
+                    actors_list = list([actor])
+                    self.dict_train_emotion_actors[emotion] = actors_list
+        for emotion, actors in self.dict_emotion_actors.items():
+            actors_train_list = self.dict_train_emotion_actors[emotion]
+            factor = round(len(actors_train_list) / len(actors), 2)
+            print(emotion, " ", factor)
+            print(actors)
+            print(actors_train_list)
 
     def get_dict_emotion_actors(self):
         for actor, emotions_set in self.dict_actor_labels.items():
@@ -84,6 +184,9 @@ class CKPDataProvider(object):
             else:
                 emotions_set = self.dict_actor_labels[actor]
                 emotions_set.add(v)
+        for actor, labels in self.dict_actor_labels.items():
+            labels_list = list(labels)
+            self.dict_actor_labels[actor] = labels_list
 
     def get_necessary_data(self):
         emotion_files = []  # 存储表情标签的txt 文件的路径
@@ -121,3 +224,8 @@ class CKPDataProvider(object):
             break
 
         return dirs_emotion_actors
+
+    def get_all_actors(self):
+        for dir_actor in self.dirs_emotion_actors:
+            actor = dir_actor.split('/')[-1]
+            self.actors_list.append(actor)

@@ -1,6 +1,6 @@
 import cv2
 import torch
-
+import sys
 
 def outclude_hidden_files(files):
     return [f for f in files if not f[0] == '.']
@@ -16,3 +16,16 @@ def show_image(image, window_name='test'):
     cv2.imshow(window_name, image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+
+# encoding=utf-8
+def get_cur_info():
+    file_name = sys._getframe().f_code.co_filename  # 当前文件名，可以通过__file__获得
+    function_name = sys._getframe().f_code.co_name  # 当前函数名
+    line_num = get_line_num()
+    return file_name,function_name,line_num
+
+def get_line_num():
+    return sys._getframe().f_lineno  # 当前行号
+
+
