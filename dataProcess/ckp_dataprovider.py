@@ -22,10 +22,12 @@ number_frames = 2
 
 
 class CKPDataProvider(object):
-    def __init__(self, reconstruct=False):
+    def __init__(self, reconstruct=False, is_train=True):
         # on Linux
+        self.is_train = is_train
         self.root_dir = '/home/steven/桌面/AICode/project_dataset/CK+/Emotion'
         self.r_dir_images = '/home/steven/桌面/AICode/project_dataset/CK+/cohn-kanade-images/'
+        self.r = '/home/steven/桌面/AICode/project_dataset/'
         self.save_dir = "/home/steven/桌面/MScProjectReports/savehandeldata/"
         self.save_train_dir = self.save_dir + 'ck_train.csv'
         self.save_validate_dir = self.save_dir + 'ck_validate.csv'
@@ -38,6 +40,35 @@ class CKPDataProvider(object):
             self.__constrrct_data()
         else:
             pass
+
+        self.array_train_images = []   # store train image array data
+        self.array_train_labels = []
+        self.__get_train_data_for_outside(self.array_train_images, self.array_train_labels, self.save_train_dir)
+
+        self.array_validate_images = []  # store validate image array data
+        self.array_validate_labels = []
+        self.__get_train_data_for_outside(self.array_validate_images, self.array_validate_labels, self.save_validate_dir)
+
+    def get_data(self, index):
+        if self.is_train:
+            return self.array_train_images[index], self.array_train_labels[index]
+        else:
+            return self.array_validate_images[index], self.array_validate_labels[index]
+
+    def __len__(self):
+        if self.is_train:
+            return len(self.array_train_images)
+        else:
+            return len(self.array_validate_images)
+
+    def __get_train_data_for_outside(self, array_img, array_label, save_path):
+        _dict_image_dir_emotion = load_dict_from_csv(save_path)
+        for image_dir, emotion in _dict_image_dir_emotion.items():
+            image_full_path = os.path.join(self.r, image_dir)
+            img = cv2.imread(image_full_path, 0)
+            label_emotion = int(emotion)
+            array_img.append(img)
+            array_label.append(label_emotion)
 
 
     def __constrrct_data(self):
