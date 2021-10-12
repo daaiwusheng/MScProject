@@ -115,4 +115,5 @@ class CKPSyntheticFaceDataset(data.Dataset):
         x_img, y_mask, y_lab = obj_data.to_value()
         x_org = obj_image.to_value()
 
-        return x_org, x_img, y_mask, y_lab
+        # return x_org, x_img, y_mask, y_lab
+        return x_img, y_lab
