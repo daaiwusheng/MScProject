@@ -9,7 +9,6 @@ from pytvision.datasets import imageutl as imutl
 from pytvision.datasets import utility
 from pytvision.transforms import functional as F
 
-
 from pytvision.transforms.aumentation import (
     ObjectImageMaskAndWeightTransform,
     ObjectImageTransform,
@@ -21,6 +20,8 @@ from pytvision.transforms.aumentation import (
 )
 
 from dataProcess.ckp_dataprovider import *
+from CKPSyntheticGenerator import *
+
 
 class CKPSyntheticFaceDataset(data.Dataset):
     '''
@@ -85,10 +86,6 @@ class CKPSyntheticFaceDataset(data.Dataset):
 
             image_org, image_ilu, mask, h = self.ren.generate(image, back)
 
-            # show_image(image_org,'image_org')
-            # show_image(image_ilu, 'image_ilu')
-            # show_image(mask,'mask')
-
             image_org = utility.to_gray(image_org.astype(np.uint8))
             image_org = utility.to_channels(image_org, self.num_channels)
             image_org = image_org.astype(np.uint8)
@@ -96,9 +93,6 @@ class CKPSyntheticFaceDataset(data.Dataset):
             image_ilu = utility.to_gray(image_ilu.astype(np.uint8))
             image_ilu = utility.to_channels(image_ilu, self.num_channels)
             image_ilu = image_ilu.astype(np.uint8)
-
-            # show_image(image_org,'image_org')
-            # show_image(normlize(image_ilu), 'image_ilu')
 
             mask = mask[:, :, 0]
             mask_t = np.zeros((mask.shape[0], mask.shape[1], 2))
@@ -118,11 +112,7 @@ class CKPSyntheticFaceDataset(data.Dataset):
         if self.transform_data:
             obj_data = self.transform_data(obj_data)
 
-
-
         x_img, y_mask, y_lab = obj_data.to_value()
         x_org = obj_image.to_value()
-
-
 
         return x_org, x_img, y_mask, y_lab
