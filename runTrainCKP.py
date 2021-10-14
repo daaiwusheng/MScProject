@@ -14,7 +14,7 @@ from pytvision import visualization as view
 
 import datetime
 from argparse import ArgumentParser
-from aug import get_transforms_aug, get_transforms_det
+from dataProcess.aug import get_transforms_aug, get_transforms_det
 from models.projectNet import *
 
 # parameters
@@ -109,7 +109,6 @@ def main():
 
     # datasets
     # training dataset
-    # SyntheticFaceDataset, SecuencialSyntheticFaceDataset
     train_data = CKPSyntheticFaceDataset(
         is_train=True,
         pathnameback=DATABACK,

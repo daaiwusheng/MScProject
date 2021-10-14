@@ -54,13 +54,16 @@ class CKPSyntheticFaceDataset(data.Dataset):
         self.num_channels = num_channels
         self.generate = generate
         self.ren = Generator(iluminate, angle, translation, warp, factor)
-        self.count = count
+        if count is None:
+            len(self.data_provider)
+        else:
+            self.count = count
 
         self.transform_image = transform_image
         self.transform_data = transform_data
 
     def __len__(self):
-        return len(self.data_provider)
+        return self.count
 
     def __getitem__(self, idx):
         # read image

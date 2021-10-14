@@ -12,7 +12,6 @@ import numpy as np
 import time
 from tqdm import tqdm
 
-from . import models as nnmodels
 from . import netlosses as nloss
 
 from pytvision.neuralnet import NeuralNetAbstract
