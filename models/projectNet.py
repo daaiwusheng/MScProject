@@ -286,53 +286,49 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
         self.logger_val = Logger('Val  ', ['loss'], [], self.plotter)
 
     def training(self, data_loader, epoch=0):
-
         # reset logger
         self.logger_train.reset()
         data_time = AverageMeter()
         batch_time = AverageMeter()
-
         # switch to evaluate mode
         self.net.train()
-
         end = time.time()
+        # accumulate loss and total number of images
+        loss_train = 0.0
+        n = 0
         for i, (x_img, label) in enumerate(data_loader):
-
             # measure data loading time
             data_time.update(time.time() - end)
             batch_size = x_img.shape[0]
-
             y_lab = label
-
             if self.cuda:
                 x_img = x_img.cuda()
                 y_lab = y_lab.cuda()
 
             # fit (forward)
             y_lab_hat = self.net(x_img, x_org)
-
             # measure accuracy and record loss
             loss = self.criterion_bce(y_lab_hat, y_lab.long())
-
+            loss_train += loss.cpu().item()
             # optimizer
             self.optimizer.zero_grad()
-            (loss * batch_size).backward()
+            loss.backward()
             self.optimizer.step()
-
-            # update
-            self.logger_train.update(
-                {'loss': loss.cpu().item()},
-                {},
-                batch_size,
-            )
 
             # measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
-
+            n += 1
             if i % self.print_freq == 0:
                 self.logger_train.logger(epoch, epoch + float(i + 1) / len(data_loader), i, len(data_loader),
                                          batch_time, )
+        # update
+        # loss_train_average = loss_train/n
+        self.logger_train.update(
+            {'loss': loss_train},
+            {},
+            n,
+        )
 
     def evaluate(self, data_loader, epoch=0):
 
@@ -340,37 +336,32 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
         self.logger_val.reset()
         batch_time = AverageMeter()
 
+        correct = 0
+        total = 0
+        loss_validate = 0.0
+        n = 0
         # switch to evaluate mode
         self.net.eval()
         with torch.no_grad():
             end = time.time()
             for i, (x_img, label) in enumerate(data_loader):
-
                 # get data (image, label)
                 batch_size = x_img.shape[0]
-
                 y_lab = label
-
                 if self.cuda:
                     x_img = x_img.cuda()
                     y_lab = y_lab.cuda()
-
                 # fit (forward)
                 y_lab_hat = self.net(x_img)
-
                 # measure accuracy and record loss
                 loss = self.criterion_bce(y_lab_hat, y_lab.long())
-
+                loss_validate += loss
+                n += 1
+                total += label.size(0)
+                correct += (y_lab_hat == label).sum().item()
                 # measure elapsed time
                 batch_time.update(time.time() - end)
                 end = time.time()
-
-                # update
-                self.logger_val.update(
-                    {'loss': loss.cpu().item()},
-                    {},
-                    batch_size,
-                )
 
                 if i % self.print_freq == 0:
                     self.logger_val.logger(
@@ -382,8 +373,16 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
                     )
 
         # save validation loss
+        acc_average = correct / total
+        # average_loss = loss_validate / n
+        # update
+        self.logger_val.update(
+            {'loss': loss_validate},
+            {'accuracy': acc_average},
+            n,
+        )
         self.vallosses = self.logger_val.info['loss']['loss'].avg
-        acc = self.logger_val.info['metrics']['topk'].avg
+        acc = self.logger_val.info['metrics']['accuracy'].avg
 
         self.logger_val.logger(
             epoch, epoch, i, len(data_loader),
@@ -398,7 +397,7 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
             self.visheatmap.show('Image', x_img.data.cpu()[0].numpy()[0, :, :])
             # self.visheatmap.show('Feature Map',srf.cpu().numpy().astype(np.float32) )
 
-        return acc
+        return acc_average
 
     def representation(self, dataloader, breal=True):
         Y_labs = []
