@@ -41,18 +41,23 @@ class CKPDataProvider(object):
         else:
             pass
 
-        self.array_train_images = []   # store train image array data
+        self.array_train_images = []  # store train image array data
         self.array_train_labels = []
         self.__get_train_data_for_outside(self.array_train_images, self.array_train_labels, self.save_train_dir)
+        self.len_train_data = len(self.array_train_labels)
 
         self.array_validate_images = []  # store validate image array data
         self.array_validate_labels = []
-        self.__get_train_data_for_outside(self.array_validate_images, self.array_validate_labels, self.save_validate_dir)
+        self.__get_train_data_for_outside(self.array_validate_images, self.array_validate_labels,
+                                          self.save_validate_dir)
+        self.len_validate_data = len(self.array_validate_labels)
 
     def get_data(self, index):
         if self.is_train:
+            index = index % self.len_train_data
             return self.array_train_images[index], self.array_train_labels[index]
         else:
+            index = index % self.len_validate_data
             return self.array_validate_images[index], self.array_validate_labels[index]
 
     def __len__(self):
@@ -69,7 +74,6 @@ class CKPDataProvider(object):
             label_emotion = int(emotion)
             array_img.append(img)
             array_label.append(label_emotion)
-
 
     def __constrrct_data(self):
         self.dirs_emotion_actors = self.get_dirs_emotion_actors()
@@ -116,7 +120,7 @@ class CKPDataProvider(object):
         save_dict_as_csv(self.save_train_dir, self.dict_train_image_dir_emotion)
         save_dict_as_csv(self.save_validate_dir, self.dict_validate_image_dir_emotion)
 
-    def get_image_dir_dict(self,dict_image_file_emotion,dict_result):
+    def get_image_dir_dict(self, dict_image_file_emotion, dict_result):
         relative_dir_r = "CK+/cohn-kanade-images/"
         for image_file, emotion in dict_image_file_emotion.items():
             image_file_splits = image_file.split('_')
@@ -124,26 +128,24 @@ class CKPDataProvider(object):
             image_dir = os.path.join(relative_dir_r + dir_image, image_file)
             dict_result[image_dir] = emotion
 
-
     def get_neutral_img_for_train_val(self):
         #  randomly get neutral images for train and validate sets
         num_classes_out_neutral = 7
         random.shuffle(self.neutral_train_image_files)
-        num_train_neutral = int(len(self.dict_train_image_filename_emotion)/num_classes_out_neutral)
+        num_train_neutral = int(len(self.dict_train_image_filename_emotion) / num_classes_out_neutral)
         images_need_train_neutral = self.neutral_train_image_files[:num_train_neutral]
 
         for image_file_name in images_need_train_neutral:
             self.dict_train_image_filename_emotion[image_file_name] = 0
 
         random.shuffle(self.neutral_validate_image_files)
-        num_validate_neutral = int(len(self.dict_validate_image_filename_emotion)/num_classes_out_neutral)
+        num_validate_neutral = int(len(self.dict_validate_image_filename_emotion) / num_classes_out_neutral)
         images_need_validate_neutral = self.neutral_validate_image_files[:num_validate_neutral]
 
         for image_file_name in images_need_validate_neutral:
             self.dict_validate_image_filename_emotion[image_file_name] = 0
 
         # print("line",get_line_num(),len(images_need_train_neutral)," ",len(images_need_validate_neutral))
-
 
     def get_dict_validate_image_filename_emotion(self):
         for ikey, emotion in self.dict_validate_key_emotion.items():
@@ -164,7 +166,6 @@ class CKPDataProvider(object):
                 self.neutral_train_image_files.append(image_files[0])
                 for image_file in image_files_need:
                     self.dict_train_image_filename_emotion[image_file] = emotion
-
 
     def get_dict_validate_key_emotion(self):
         for actor in self.whole_validate_actors_list:

@@ -1,4 +1,4 @@
-from abstract_model import *
+from models.abstract_model import *
 from torchvision import models
 
 

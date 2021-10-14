@@ -1,4 +1,4 @@
-from resnet_model import *
+from models.resnet_model import *
 
 
 class ResNet18(ResNestBaseModel):

@@ -156,7 +156,7 @@ class ProjectNeuralNetAbstract(NeuralNetAbstract):
         # --------------------------------------------------------------------------------------------
         kw = {'dim': num_output_channels, 'num_classes': self.num_classes, 'num_channels': num_input_channels,
               'pretrained': pretrained}
-        self.net = ModelFactory(arch, self.num_classes)
+        self.net = ModelFactory()(arch, self.num_classes)
         self.s_arch = arch
 
         self.num_output_channels = num_output_channels
@@ -282,7 +282,7 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
         )
 
         self.logger_train = Logger('Train', ['loss'], [], self.plotter)
-        self.logger_val = Logger('Val  ', ['loss'], [], self.plotter)
+        self.logger_val = Logger('Val  ', ['loss'], ['accuracy'], self.plotter)
 
     def training(self, data_loader, epoch=0):
         # reset logger
@@ -299,13 +299,13 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
             # measure data loading time
             data_time.update(time.time() - end)
             batch_size = x_img.shape[0]
-            y_lab = label
+            y_lab = label[:, 0]
             if self.cuda:
                 x_img = x_img.cuda()
                 y_lab = y_lab.cuda()
 
             # fit (forward)
-            y_lab_hat = self.net(x_img, x_org)
+            y_lab_hat = self.net(x_img)
             # measure accuracy and record loss
             loss = self.criterion_bce(y_lab_hat, y_lab.long())
             loss_train += loss.cpu().item()
@@ -346,7 +346,7 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
             for i, (x_img, label) in enumerate(data_loader):
                 # get data (image, label)
                 batch_size = x_img.shape[0]
-                y_lab = label
+                y_lab = label[:, 0]
                 if self.cuda:
                     x_img = x_img.cuda()
                     y_lab = y_lab.cuda()
@@ -354,10 +354,11 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
                 y_lab_hat = self.net(x_img)
                 # measure accuracy and record loss
                 loss = self.criterion_bce(y_lab_hat, y_lab.long())
-                loss_validate += loss
+                loss_validate += loss.cpu().item()
                 n += 1
                 total += label.size(0)
-                correct += (y_lab_hat == label).sum().item()
+                _, predicted = torch.max(y_lab_hat.data, 1)
+                correct += (predicted == y_lab).sum().item()
                 # measure elapsed time
                 batch_time.update(time.time() - end)
                 end = time.time()
@@ -409,7 +410,7 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
                     x_img, y_lab = sample['image'], sample['label']
                     y_lab = y_lab.argmax(dim=1)
                 else:
-                    x_org, x_img, y_mask, y_lab = sample
+                    x_img, y_lab = sample
                     y_lab = y_lab[:, 0]
 
                 if self.cuda:

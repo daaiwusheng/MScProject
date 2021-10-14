@@ -20,7 +20,7 @@ from pytvision.transforms.aumentation import (
 )
 
 from dataProcess.ckp_dataprovider import *
-from CKPSyntheticGenerator import *
+from dataProcess.CKPSyntheticGenerator import *
 
 
 class CKPSyntheticFaceDataset(data.Dataset):
