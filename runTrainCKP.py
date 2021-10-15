@@ -22,7 +22,7 @@ DATABACK = '/databig/coco/unlabeled2017/'
 DATA = '~/.datasets'
 NAMEDATASET = 'ckp_by_myself'
 PROJECT = '/databig/projectLog'  # write log to this disk on Linux
-EPOCHS = 100
+EPOCHS = 20
 TRAINITERATION = 16000
 TESTITERATION = 1600
 BATCHSIZE = 64  # 32, 64, 128, 160, 200, 240
@@ -32,7 +32,7 @@ PRINT_FREQ = 100
 WORKERS = 1
 RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
-NAMEMETHOD = 'project_net'  # project_net
+NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
 ARCH = 'resnet18'  # resnet18
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
@@ -41,10 +41,10 @@ NUMCLASS = 8  # 6, 7, 8
 NUMCHANNELS = 3
 DIM = 32
 SNAPSHOT = 10
-IMAGESIZE = 112 # according to the neural network input
+IMAGESIZE = 112  # according to the neural network input
 KFOLD = 0
 NACTOR = 10
-BACKBONE = 'resnet18'  # preactresnet, resnet, cvgg
+BACKBONE = 'resnet18'  # resnet, cvgg
 
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + '_dim' + str(
     DIM) + '_bb' + BACKBONE + '_fold' + str(KFOLD) + '_000'
@@ -71,7 +71,8 @@ def main():
     fname = NAMEMETHOD
 
     net_train = {
-        'project_net': ProjectNeuralNet,
+        'ProjectNeuralNet': ProjectNeuralNet,
+        'ProjectStatisticsNeuralNet': ProjectStatisticsNeuralNet
     }
 
     network = net_train[fname](
