@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import random
 
+import torch
 import torch.utils.data as data
 
 from pytvision.datasets import imageutl as imutl
@@ -22,13 +23,15 @@ from pytvision.transforms.aumentation import (
 from dataProcess.ckp_dataprovider import *
 from dataProcess.CKPSyntheticGenerator import *
 
+GENERATE_IMAGE = 'image'
+GENERATE_IMAGE_SYN = 'image_and_mask'
 
 class CKPSyntheticFaceDataset(data.Dataset):
     '''
      Management for Synthetic Face dataset
      '''
-    generate_image = 'image'
-    generate_image_and_mask = 'image_and_mask'
+    # generate_image = 'image'
+    # generate_image_and_mask = 'image_and_mask'
 
     def __init__(self,
                  is_train=True,
@@ -36,7 +39,7 @@ class CKPSyntheticFaceDataset(data.Dataset):
                  ext='jpg',
                  count=None,
                  num_channels=3,
-                 generate='image_and_mask',
+                 generate=GENERATE_IMAGE_SYN,
                  iluminate=True, angle=45, translation=0.3, warp=0.1, factor=0.2,
                  transform_image=None,
                  transform_data=None,
@@ -82,10 +85,10 @@ class CKPSyntheticFaceDataset(data.Dataset):
         else:
             back = np.ones((640, 1024, 3), dtype=np.uint8) * 255
 
-        if self.generate == 'image':
+        if self.generate == GENERATE_IMAGE:
             obj = ObjectImageTransform(image)
 
-        elif self.generate == 'image_and_mask':
+        elif self.generate == GENERATE_IMAGE_SYN:
 
             image_org, image_ilu, mask, h = self.ren.generate(image, back)
 
@@ -102,21 +105,26 @@ class CKPSyntheticFaceDataset(data.Dataset):
             mask_t[:, :, 0] = (mask == 0).astype(np.uint8)  # 0-backgraund
             mask_t[:, :, 1] = (mask == 1).astype(np.uint8)
 
-            obj_image = ObjectImageTransform(image_org.copy())
-            obj_data = ObjectImageAndMaskMetadataTransform(image_ilu.copy(), mask_t,
-                                                           np.concatenate(([label], h), axis=0))
+            obj_image = ObjectImageTransform(image_ilu.copy())
+            # obj_data = ObjectImageAndMaskMetadataTransform(image_ilu.copy(), mask_t,
+            #                                                np.concatenate(([label], h), axis=0))
 
         else:
             assert (False)
 
         if self.transform_image:
-            obj_image = self.transform_image(obj_image)
+            if self.generate == GENERATE_IMAGE:
+                obj_image = self.transform_image(obj)
+            else:
+                obj_image = self.transform_image(obj_image)
 
-        if self.transform_data:
-            obj_data = self.transform_data(obj_data)
+        x_img = obj_image.to_value()
+        y_lab = torch.tensor(int(label))
 
-        x_img, y_mask, y_lab = obj_data.to_value()
-        x_org = obj_image.to_value()
+        # if self.transform_data:
+        #     if self.generate == GENERATE_IMAGE_SYN:
+        #         obj_image = self.transform_image(obj_image)
+        #         x_img = obj_image.to_value()
+        #         y_lab = torch.tensor(int(label))
 
-        # return x_org, x_img, y_mask, y_lab
         return x_img, y_lab

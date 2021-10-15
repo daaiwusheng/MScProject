@@ -22,19 +22,20 @@ DATABACK = '/databig/coco/unlabeled2017/'
 DATA = '~/.datasets'
 NAMEDATASET = 'ckp_by_myself'
 PROJECT = '/databig/projectLog'  # write log to this disk on Linux
-EPOCHS = 20
+EPOCHS = 100
 TRAINITERATION = 16000
 TESTITERATION = 1600
 BATCHSIZE = 64  # 32, 64, 128, 160, 200, 240
 LEARNING_RATE = 0.0001
 MOMENTUM = 0.5
-PRINT_FREQ = 100
+PRINT_FREQ = 30
 WORKERS = 1
 RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
 ARCH = 'resnet18'  # resnet18
 PRE_Trained = False
+GENERATER_Mode = GENERATE_IMAGE_SYN  # GENERATE_IMAGE_SYN
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
 SCHEDULER = 'fixed'
@@ -118,6 +119,7 @@ def main():
         ext='jpg',
         count=trainiteration,
         num_channels=NUMCHANNELS,
+        generate=GENERATER_Mode,
         iluminate=True, angle=30, translation=0.2, warp=0.1, factor=0.2,
         transform_data=get_transforms_aug(imsize),
         transform_image=get_transforms_det(imsize),
@@ -144,6 +146,7 @@ def main():
         ext='jpg',
         count=testiteration,
         num_channels=NUMCHANNELS,
+        generate=GENERATER_Mode,
         iluminate=True, angle=30, translation=0.2, warp=0.1, factor=0.2,
         transform_data=get_transforms_aug(imsize),
         transform_image=get_transforms_det(imsize),

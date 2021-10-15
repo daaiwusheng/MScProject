@@ -242,7 +242,7 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
                  pre_trained=False
                  ):
         super(ProjectNeuralNet, self).__init__(patchproject, nameproject, no_cuda, parallel, seed, print_freq, gpu,
-                                               view_freq,pre_trained)
+                                               view_freq, pre_trained)
 
     def create(self,
                arch,
@@ -418,7 +418,7 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
                     y_lab = y_lab.argmax(dim=1)
                 else:
                     x_img, y_lab = sample
-                    y_lab = y_lab[:, 0]
+                    y_lab = y_lab
 
                 if self.cuda:
                     x_img = x_img.cuda()
@@ -471,7 +471,7 @@ class ProjectStatisticsNeuralNet(ProjectNeuralNetAbstract):
                  ):
         super(ProjectStatisticsNeuralNet, self).__init__(patchproject, nameproject, no_cuda, parallel, seed, print_freq,
                                                          gpu,
-                                                         view_freq,pre_trained)
+                                                         view_freq, pre_trained)
 
     def create(self,
                arch,
@@ -535,7 +535,7 @@ class ProjectStatisticsNeuralNet(ProjectNeuralNetAbstract):
             # measure data loading time
             data_time.update(time.time() - end)
             batch_size = x_img.shape[0]
-            y_lab = label[:, 0]
+            y_lab = label
             if self.cuda:
                 x_img = x_img.to(self.device, non_blocking=True)
                 y_lab = y_lab.to(self.device, non_blocking=True)
@@ -593,7 +593,7 @@ class ProjectStatisticsNeuralNet(ProjectNeuralNetAbstract):
             for i, (x_img, label) in enumerate(data_loader):
                 # get data (image, label)
                 batch_size = x_img.shape[0]
-                y_lab = label[:, 0]
+                y_lab = label
                 if self.cuda:
                     x_img = x_img.to(self.device, non_blocking=True)
                     y_lab = y_lab.to(self.device, non_blocking=True)
@@ -654,7 +654,7 @@ class ProjectStatisticsNeuralNet(ProjectNeuralNetAbstract):
                     y_lab = y_lab.argmax(dim=1)
                 else:
                     x_img, y_lab = sample
-                    y_lab = y_lab[:, 0]
+                    y_lab = y_lab
 
                 if self.cuda:
                     x_img = x_img.cuda()
