@@ -39,7 +39,8 @@ class ProjectNeuralNetAbstract(NeuralNetAbstract):
                  seed=1,
                  print_freq=10,
                  gpu=0,
-                 view_freq=1
+                 view_freq=1,
+                 pre_trained=False
                  ):
         """
         Initialization
@@ -56,6 +57,7 @@ class ProjectNeuralNetAbstract(NeuralNetAbstract):
         super(ProjectNeuralNetAbstract, self).__init__(patchproject, nameproject, no_cuda, parallel, seed, print_freq,
                                                        gpu)
         self.view_freq = view_freq
+        self.pre_trained = pre_trained
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
         else:
@@ -160,7 +162,7 @@ class ProjectNeuralNetAbstract(NeuralNetAbstract):
         # --------------------------------------------------------------------------------------------
         kw = {'dim': num_output_channels, 'num_classes': self.num_classes, 'num_channels': num_input_channels,
               'pretrained': pretrained}
-        self.net = ModelFactory()(arch, self.num_classes)
+        self.net = ModelFactory()(arch, self.num_classes, self.pre_trained)
         self.s_arch = arch
 
         self.num_output_channels = num_output_channels
@@ -236,10 +238,11 @@ class ProjectNeuralNet(ProjectNeuralNetAbstract):
                  seed=1,
                  print_freq=10,
                  gpu=0,
-                 view_freq=1
+                 view_freq=1,
+                 pre_trained=False
                  ):
         super(ProjectNeuralNet, self).__init__(patchproject, nameproject, no_cuda, parallel, seed, print_freq, gpu,
-                                               view_freq)
+                                               view_freq,pre_trained)
 
     def create(self,
                arch,
@@ -463,11 +466,12 @@ class ProjectStatisticsNeuralNet(ProjectNeuralNetAbstract):
                  seed=1,
                  print_freq=10,
                  gpu=0,
-                 view_freq=1
+                 view_freq=1,
+                 pre_trained=False
                  ):
         super(ProjectStatisticsNeuralNet, self).__init__(patchproject, nameproject, no_cuda, parallel, seed, print_freq,
                                                          gpu,
-                                                         view_freq)
+                                                         view_freq,pre_trained)
 
     def create(self,
                arch,
@@ -558,19 +562,19 @@ class ProjectStatisticsNeuralNet(ProjectNeuralNetAbstract):
             if i % self.print_freq == 0:
                 self.logger_train.logger(epoch, epoch + float(i + 1) / len(data_loader), i, len(data_loader),
                                          batch_time,
-                                         bplotter=False,
+                                         bplotter=True,
                                          bavg=True,
                                          bsummary=False, )
 
         # train_loss_avg = self.logger_val.info['loss']['loss'].avg
 
-        self.logger_train.logger(
-            epoch, epoch, i, len(data_loader),
-            batch_time,
-            bplotter=True,
-            bavg=True,
-            bsummary=True,
-        )
+        # self.logger_train.logger(
+        #     epoch, epoch, i, len(data_loader),
+        #     batch_time,
+        #     bplotter=True,
+        #     bavg=True,
+        #     bsummary=True,
+        # )
 
     def evaluate(self, data_loader, epoch=0):
 

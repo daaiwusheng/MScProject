@@ -34,6 +34,7 @@ RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
 ARCH = 'resnet18'  # resnet18
+PRE_Trained = False
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
 SCHEDULER = 'fixed'
@@ -84,6 +85,7 @@ def main():
         print_freq=PRINT_FREQ,
         gpu=GPU,
         view_freq=view_freq,
+        pre_trained = PRE_Trained
     )
 
     network.create(
