@@ -58,7 +58,7 @@ class CKPSyntheticFaceDataset(data.Dataset):
         self.generate = generate
         self.ren = Generator(iluminate, angle, translation, warp, factor)
         if count is None:
-            len(self.data_provider)
+            self.count = len(self.data_provider)
         else:
             self.count = count
 

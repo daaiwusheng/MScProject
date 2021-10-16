@@ -22,19 +22,19 @@ DATABACK = '/databig/coco/unlabeled2017/'
 DATA = '~/.datasets'
 NAMEDATASET = 'ckp_by_myself'
 PROJECT = '/databig/projectLog'  # write log to this disk on Linux
-EPOCHS = 100
+EPOCHS = 50
 TRAINITERATION = 16000
 TESTITERATION = 1600
 BATCHSIZE = 64  # 32, 64, 128, 160, 200, 240
 LEARNING_RATE = 0.0001
 MOMENTUM = 0.5
-PRINT_FREQ = 30
+PRINT_FREQ = 50
 WORKERS = 1
 RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
 ARCH = 'resnet18'  # resnet18
-PRE_Trained = False
+PRE_Trained = True  # if using pretrained model, set True
 GENERATER_Mode = GENERATE_IMAGE_SYN  # GENERATE_IMAGE_SYN
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
@@ -46,7 +46,8 @@ SNAPSHOT = 10
 IMAGESIZE = 112  # according to the neural network input
 KFOLD = 0
 NACTOR = 10
-BACKBONE = 'resnet18'  # resnet, cvgg
+BACKBONE = 'resnet18_pretrained'  # resnet18, resnet18_pretrained
+B_Train = True  # True, False for evaluate the model
 
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + '_dim' + str(
     DIM) + '_bb' + BACKBONE + '_fold' + str(KFOLD) + '_000'
@@ -64,8 +65,15 @@ def main():
     num_channels = NUMCHANNELS
     dim = DIM
     view_freq = 1
-    trainiteration = TRAINITERATION  # not use this currently
-    testiteration = TESTITERATION  # not use this currently
+
+    if B_Train:
+        trainiteration = TRAINITERATION  #
+        testiteration = TESTITERATION  #
+    else:
+        trainiteration = None  #
+        testiteration = None  #
+        # GENERATER_Mode = GENERATE_IMAGE
+
     no_cuda = False
     seed = 1
     finetuning = False
@@ -86,7 +94,7 @@ def main():
         print_freq=PRINT_FREQ,
         gpu=GPU,
         view_freq=view_freq,
-        pre_trained = PRE_Trained
+        pre_trained=PRE_Trained
     )
 
     network.create(
@@ -166,7 +174,10 @@ def main():
     print(network)
 
     # training neural net
-    network.fit(train_loader, val_loader, EPOCHS, SNAPSHOT)
+    if B_Train:
+        network.fit(train_loader, val_loader, EPOCHS, SNAPSHOT)
+    else:
+        network.evaluate_model(val_loader)
 
     print("Optimization Finished!")
     print("DONE!!!")

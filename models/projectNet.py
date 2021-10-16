@@ -22,6 +22,7 @@ from pytvision import utils as pytutils
 
 from models.modelfactory import *
 
+from utility.tools import *
 
 # ----------------------------------------------------------------------------------------------
 # Neural Net for Attention
@@ -648,23 +649,38 @@ class ProjectStatisticsNeuralNet(ProjectNeuralNetAbstract):
         self.net.eval()
         with torch.no_grad():
             for i_batch, sample in enumerate(tqdm(dataloader)):
-
-                if breal:
-                    x_img, y_lab = sample['image'], sample['label']
-                    y_lab = y_lab.argmax(dim=1)
-                else:
-                    x_img, y_lab = sample
-                    y_lab = y_lab
-
+                x_img, y_lab = sample
                 if self.cuda:
                     x_img = x_img.cuda()
                 y_lab_hat = self.net(x_img)
                 Y_labs.append(y_lab)
-                Y_lab_hats.append(y_lab_hat.data.cpu())
+                _, predicted = torch.max(y_lab_hat.data, 1)
+                Y_lab_hats.append(predicted.data.cpu())
 
         Y_labs = np.concatenate(Y_labs, axis=0)
         Y_lab_hats = np.concatenate(Y_lab_hats, axis=0)
         return Y_labs, Y_lab_hats
+
+    def evaluate_model(self, dataloader, breal=True):
+        #  calculate statistics data, and generate confusion matrix
+        y_trues, y_predicts = self.representation(dataloader, breal)
+        if torch.is_tensor(y_trues):
+            y_trues = y_trues.numpy().tolist()
+        if torch.is_tensor(y_predicts):
+            y_predicts = y_predicts.numpy().tolist()
+
+        y_trues = list(map(int, y_trues))
+        y_predicts = list(map(int, y_predicts))
+
+        acc, recall, precision, f_1_score = calculate_scores(y_trues, y_predicts)
+        print('scores:')
+        print('acc:     ', acc)
+        print('recall: ', recall)
+        print('precision: ', precision)
+        print('f_1_score: ', f_1_score)
+        y_trues_str = emotions_to_str_names(y_trues)
+        y_predicts_str = emotions_to_str_names(y_predicts)
+        draw_confusion_matrix(y_trues_str, y_predicts_str, emotion_labs_strings)
 
     def __call__(self, image):
         # switch to evaluate mode
