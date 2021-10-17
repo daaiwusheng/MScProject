@@ -1,4 +1,5 @@
 from models.resnet_18 import *
+from models.resnet_34 import *
 
 
 class ModelFactory(object):
@@ -8,5 +9,7 @@ class ModelFactory(object):
     def __call__(self, arch, num_classes, pre_trained):
         if arch == 'resnet18':
             return ResNet18(num_classes, pre_trained)
+        elif arch == 'resnet34':
+            return ResNet34(num_classes, pre_trained)
         else:
             assert False

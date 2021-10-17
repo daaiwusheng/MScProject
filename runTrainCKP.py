@@ -33,7 +33,7 @@ WORKERS = 1
 RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
-ARCH = 'resnet18'  # resnet18
+ARCH = 'resnet34'  # resnet18
 PRE_Trained = True  # if using pretrained model, set True
 GENERATER_Mode = GENERATE_IMAGE_SYN  # GENERATE_IMAGE_SYN
 LOSS = 'cross_entropy_loss'
@@ -46,18 +46,27 @@ SNAPSHOT = 10
 IMAGESIZE = 112  # according to the neural network input
 KFOLD = 0
 NACTOR = 10
-BACKBONE = 'resnet18_pretrained'  # resnet18, resnet18_pretrained
+BACKBONE = 'resnet34_pretrained'  # resnet18, resnet18_pretrained
 B_Train = True  # True, False for evaluate the model
 
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + '_dim' + str(
-    DIM) + '_bb' + BACKBONE + '_fold' + str(KFOLD) + '_000'
+    DIM) + '_bb' + BACKBONE + 'Epoch_'+str(EPOCHS) + '_fold' + str(KFOLD) + '_000'
 
+'''
+check list before run this file:
+PRE_Trained
+ARCH
+IMAGESIZE
+BACKBONE
+B_Train
+GENERATER_Mode
+'''
 
 # experiment name
 
 
 def main():
-    print('开始训练')
+    print('start running:', PRE_Trained )
     # parameters
     imsize = IMAGESIZE
     parallel = False
@@ -72,7 +81,7 @@ def main():
     else:
         trainiteration = None  #
         testiteration = None  #
-        # GENERATER_Mode = GENERATE_IMAGE
+        # GENERATER_Mode = GENERATE_IMAGE  # if B_train is false, turn this sentence on
 
     no_cuda = False
     seed = 1
