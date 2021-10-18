@@ -33,8 +33,8 @@ WORKERS = 1
 RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
-ARCH = 'resnet34'  # resnet18
-PRE_Trained = True  # if using pretrained model, set True
+ARCH = 'resnet50'  # resnet18
+PRE_Trained = False  # if using pretrained model, set True
 GENERATER_Mode = GENERATE_IMAGE_SYN  # GENERATE_IMAGE_SYN
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
@@ -46,11 +46,11 @@ SNAPSHOT = 10
 IMAGESIZE = 112  # according to the neural network input
 KFOLD = 0
 NACTOR = 10
-BACKBONE = 'resnet34_pretrained'  # resnet18, resnet18_pretrained
+BACKBONE = 'resnet50'  # resnet18, resnet18_pretrained,resnet34_pretrained
 B_Train = True  # True, False for evaluate the model
 
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + '_dim' + str(
-    DIM) + '_bb' + BACKBONE + 'Epoch_'+str(EPOCHS) + '_fold' + str(KFOLD) + '_000'
+    DIM) + '_bb_' + BACKBONE + '_Epoch_'+str(EPOCHS) + '_fold_' + str(KFOLD) + '_000'
 
 '''
 check list before run this file:
