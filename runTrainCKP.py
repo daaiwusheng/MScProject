@@ -22,7 +22,7 @@ DATABACK = '/databig/coco/unlabeled2017/'
 DATA = '~/.datasets'
 NAMEDATASET = 'ckp_by_myself'
 PROJECT = '/databig/projectLog'  # write log to this disk on Linux
-EPOCHS = 100
+EPOCHS = 70
 TRAINITERATION = 16000
 TESTITERATION = 1600
 BATCHSIZE = 64  # 32, 64, 128, 160, 200, 240
@@ -33,9 +33,9 @@ WORKERS = 1
 RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
-ARCH = 'resnet101'  # resnet18
-PRE_Trained = False  # if using pretrained model, set True
-GENERATER_Mode = GENERATE_IMAGE_SYN  # GENERATE_IMAGE_SYN
+ARCH = 'densenet121'  # resnet18
+PRE_Trained = True  # if using pretrained model, set True
+GENERATER_Mode = GENERATE_IMAGE  # GENERATE_IMAGE_SYN
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
 SCHEDULER = 'fixed'
@@ -46,8 +46,8 @@ SNAPSHOT = 10
 IMAGESIZE = 112  # according to the neural network input
 KFOLD = 0
 NACTOR = 10
-BACKBONE = 'resnet101'  # resnet18, resnet18_pretrained,resnet34_pretrained,resnet50_pretrained
-B_Train = True  # True, False for evaluate the model
+BACKBONE = 'densenet121_pretrained'  # resnet18, resnet18_pretrained,resnet34_pretrained,resnet50_pretrained,resnet152_pretrained
+B_Train = False  # True, False for evaluate the model
 
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + '_dim' + str(
     DIM) + '_bb_' + BACKBONE + '_Epoch_'+str(EPOCHS) + '_fold_' + str(KFOLD) + '_000'
@@ -81,7 +81,6 @@ def main():
     else:
         trainiteration = None  #
         testiteration = None  #
-        # GENERATER_Mode = GENERATE_IMAGE  # if B_train is false, turn this sentence on
 
     no_cuda = False
     seed = 1
