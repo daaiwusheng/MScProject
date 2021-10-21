@@ -4,6 +4,7 @@ from models.resnet_50 import *
 from models.resnet_101 import *
 from models.resnet_152 import *
 from models.densenet_121 import *
+from models.vgg_19 import *
 
 
 class ModelFactory(object):
@@ -23,5 +24,7 @@ class ModelFactory(object):
             return ResNet152(num_classes, pre_trained)
         elif arch == 'densenet121':
             return DenseNet121(num_classes, pre_trained)
+        elif arch == 'vgg19':
+            return VGG19(num_classes, pre_trained)
         else:
             assert False
