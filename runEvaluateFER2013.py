@@ -7,6 +7,7 @@ from torch.utils.data.sampler import SubsetRandomSampler, WeightedRandomSampler
 from torchvision import transforms, utils
 
 from dataProcess.CKPSyntheticFaceDataset import *
+from dataProcess.FER2013Dataset import *
 from models.projectNet import *
 
 from pytvision.transforms import transforms as mtrans
@@ -34,7 +35,7 @@ RESUME = 'model_best.pth.tar'  # chk000000, model_best
 GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
 ARCH = 'resnet34'  # resnet18
-PRE_Trained = True  # if using pretrained model, set True
+PRE_Trained = False  # if using pretrained model, set True
 GENERATER_Mode = GENERATE_IMAGE  # GENERATE_IMAGE_SYN
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
@@ -46,13 +47,13 @@ SNAPSHOT = 10
 IMAGESIZE = 112  # according to the neural network input
 KFOLD = 0
 NACTOR = 10
-BACKBONE = 'resnet34_pretrained'  # resnet18, resnet18_pretrained,resnet34_pretrained,resnet50_pretrained,resnet152_pretrained,densenet121_pretrained
+BACKBONE = 'resnet34_pretrained'  # resnet18, resnet18_pretrained,resnet34_pretrained,resnet50_pretrained
 B_Train = False  # True, False for evaluate the model
 
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + \
            '_dim' + str(DIM) + '_bb_' + BACKBONE + '_Epoch_' + \
            str(EPOCHS) + '_images_' + str(TRAINITERATION) + '_fold_' + str(KFOLD) + '_000'
-# EXP_NAME = 'MSc_ProjectStatisticsNeuralNet_resnet152_cross_entropy_loss_adam_ckp_by_myself_dim32_bb_resnet152_pretrained_Epoch_50_images_32000_fold_0_000'
+
 '''
 check list before run this file:
 PRE_Trained
@@ -61,16 +62,13 @@ IMAGESIZE
 BACKBONE
 B_Train
 GENERATER_Mode
-TRAINITERATION
-EXP_NAME
 '''
-
 
 # experiment name
 
 
 def main():
-    print('start running:', PRE_Trained)
+    print('start running:', PRE_Trained )
     # parameters
     imsize = IMAGESIZE
     parallel = False
@@ -160,16 +158,11 @@ def main():
 
     # validate dataset
     # SyntheticFaceDataset, SecuencialSyntheticFaceDataset
-    val_data = CKPSyntheticFaceDataset(
-        is_train=False,
-        pathnameback=DATABACK,
-        ext='jpg',
-        count=testiteration,
-        num_channels=NUMCHANNELS,
-        generate=GENERATER_Mode,
-        iluminate=True, angle=30, translation=0.2, warp=0.1, factor=0.2,
-        transform_data=get_transforms_aug(imsize),
+    val_data = FER2013Dataset(
+        num_channels=3,
+        image_size=IMAGESIZE,
         transform_image=get_transforms_det(imsize),
+
     )
 
     val_loader = DataLoader(
