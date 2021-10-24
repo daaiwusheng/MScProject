@@ -44,6 +44,7 @@ class FER2013Dataset(data.Dataset):
         # read image
         image, label = self.data_provider.get_data(idx)
         image = cv2.resize(image, (self.image_size, self.image_size), interpolation=cv2.INTER_CUBIC)
+        # show_image(image,"fer")
         image = utility.to_channels(image, self.num_channels)
         obj = ObjectImageTransform(image)
         obj_image = self.transform_image(obj)

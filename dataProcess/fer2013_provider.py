@@ -22,6 +22,7 @@ class FER2013Provider(object):
         self.save_dir = "/home/steven/桌面/AICode/project_dataset/FER2013/savehandeldata/"
 
         self.save_validate_dir = self.save_dir + 'fer2013_validate.csv'
+
         self.array_images = []  # image dir list
         self.array_labels = []  # label list
         data_exist_bool = os.path.exists(self.save_validate_dir)
@@ -70,5 +71,3 @@ class FER2013Provider(object):
                 # print(os.path.join(root, emotion))
                 for _, _, image_names in os.walk(os.path.join(root, emotion), topdown=True):
                     self.dict_emotion_images[emotion] = image_names
-
-

@@ -5,7 +5,7 @@ from models.resnet_101 import *
 from models.resnet_152 import *
 from models.densenet_121 import *
 from models.vgg_19 import *
-
+from models.conv_mixer import *
 
 class ModelFactory(object):
     def __init__(self):
@@ -26,5 +26,7 @@ class ModelFactory(object):
             return DenseNet121(num_classes, pre_trained)
         elif arch == 'vgg19':
             return VGG19(num_classes, pre_trained)
+        elif arch == 'conmixer':
+            return ConverlutionMixer(num_classes, pre_trained)
         else:
             assert False

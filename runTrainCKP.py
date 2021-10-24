@@ -35,7 +35,7 @@ GPU = 0
 NAMEMETHOD = 'ProjectStatisticsNeuralNet'  # ProjectNeuralNet, ProjectStatisticsNeuralNet
 ARCH = 'resnet34'  # resnet18
 PRE_Trained = True  # if using pretrained model, set True
-GENERATER_Mode = GENERATE_IMAGE  # GENERATE_IMAGE_SYN
+GENERATER_Mode = GENERATE_IMAGE_SYN  # GENERATE_IMAGE_SYN
 LOSS = 'cross_entropy_loss'
 OPT = 'adam'
 SCHEDULER = 'fixed'
@@ -47,7 +47,7 @@ IMAGESIZE = 112  # according to the neural network input
 KFOLD = 0
 NACTOR = 10
 BACKBONE = 'resnet34_pretrained'  # resnet18, resnet18_pretrained,resnet34_pretrained,resnet50_pretrained,resnet152_pretrained,densenet121_pretrained
-B_Train = False  # True, False for evaluate the model
+B_Train = True  # True, False for evaluate the model
 
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + \
            '_dim' + str(DIM) + '_bb_' + BACKBONE + '_Epoch_' + \

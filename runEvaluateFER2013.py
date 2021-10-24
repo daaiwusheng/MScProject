@@ -53,7 +53,7 @@ B_Train = False  # True, False for evaluate the model
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + \
            '_dim' + str(DIM) + '_bb_' + BACKBONE + '_Epoch_' + \
            str(EPOCHS) + '_images_' + str(TRAINITERATION) + '_fold_' + str(KFOLD) + '_000'
-
+EXP_NAME = "MSc_ProjectStatisticsNeuralNet_resnet34_cross_entropy_loss_adam_ckp_by_myself_dim32_bbresnet34_pretrainedEpoch_50_fold0_000"
 '''
 check list before run this file:
 PRE_Trained
