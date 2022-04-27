@@ -26,10 +26,10 @@ class CKPDataProvider(object):
     def __init__(self, reconstruct=False, is_train=True):
         # on Linux
         self.is_train = is_train
-        self.root_dir = '/home/steven/桌面/AICode/project_dataset/CK+/Emotion'
-        self.r_dir_images = '/home/steven/桌面/AICode/project_dataset/CK+/cohn-kanade-images/'
-        self.r = '/home/steven/桌面/AICode/project_dataset/'
-        self.save_dir = "/home/steven/桌面/MScProjectReports/savehandeldata/"
+        self.root_dir = '/home/steven/code/MScProject_dataset/CK+/Emotion'
+        self.r_dir_images = '/home/steven/code/MScProject_dataset/CK+/cohn-kanade-images/'
+        self.r = '/home/steven/code/MScProject_dataset/'
+        self.save_dir = "/home/steven/code/savehandeldata/"
         self.save_train_dir = self.save_dir + 'ck_train.csv'
         self.save_validate_dir = self.save_dir + 'ck_validate.csv'
 

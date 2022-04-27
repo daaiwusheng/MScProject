@@ -5,14 +5,16 @@ import torch.nn as nn
 import numpy as np
 from utility.tools import *
 
+import cv2
+
+print(cv2.__version__)
 
 
+# from  dataProcess.ckp_dataprovider import *
 
-from  dataProcess.ckp_dataprovider import *
 
-
-ckp_provider = CKPDataProvider(is_train=False)
-print(len(ckp_provider))
+#ckp_provider = CKPDataProvider(is_train=False)
+# print(len(ckp_provider))
 # print(len(ckp_provider.actors_list))
 # print(ckp_provider.dict_key_seq_labels)
 # for k,v in ckp_provider.dict_train_image_dir_emotion.items():
