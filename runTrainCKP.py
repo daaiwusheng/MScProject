@@ -26,7 +26,7 @@ EPOCHS = 20
 TRAINITERATION = 160000
 TESTITERATION = 16000
 BATCHSIZE = 512  # 32, 64, 128, 160, 200, 240
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.00005
 MOMENTUM = 0.5
 PRINT_FREQ = 50
 WORKERS = 1
@@ -51,7 +51,7 @@ B_Train = True  # True, False for evaluate the model
 # experiment name
 EXP_NAME = 'MSc_' + NAMEMETHOD + '_' + ARCH + '_' + LOSS + '_' + OPT + '_' + NAMEDATASET + \
            '_dim' + str(DIM) + '_bb_' + BACKBONE + '_Epoch_' + \
-           str(EPOCHS) + '_images_' + str(TRAINITERATION) + '_fold_' + str(KFOLD) + '_000'
+           str(EPOCHS) + '_batchsize_' + str(BATCHSIZE) + '_lr_' + str(LEARNING_RATE) + '_images_' + str(TRAINITERATION) + '_fold_' + str(KFOLD) + '_000'
 # EXP_NAME = 'MSc_ProjectStatisticsNeuralNet_resnet152_cross_entropy_loss_adam_ckp_by_myself_dim32_bb_resnet152_pretrained_Epoch_50_images_32000_fold_0_000'
 '''
 check list before run this file:
